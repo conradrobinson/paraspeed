@@ -1,7 +1,12 @@
 import { RenderingEngine } from "./Renderer/RenderingEngine"
+import ShaderFactory from "./Renderer/Shaders/ShaderFactory";
 
 class Engine {
-    renderingEngine: RenderingEngine = new RenderingEngine()
+    renderingEngine: RenderingEngine = new RenderingEngine();
+    shaderFactory: ShaderFactory = new ShaderFactory("./shaders/frag.wgsl");
+    
+    
+
 	constructor() {}
 
     async setup(canvas: HTMLCanvasElement) {

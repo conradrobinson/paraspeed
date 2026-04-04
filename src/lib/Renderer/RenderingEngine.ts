@@ -2,6 +2,9 @@ import BindGroup from './BindGroup';
 import { IUniformData } from './Buffers/IUniformData';
 import UniformBuffer from './Buffers/UniformBuffer';
 import { Shader } from './Shaders/Shader';
+import ShaderFactoryDynamic from './Shaders/ShaderFactoryDynamic';
+import ShaderFactoryStatic from './Shaders/ShaderFactoryStatic';
+import { emptyInputs } from './Shaders/inputs/ShaderInputs';
 
 export class RenderingEngine {
 	private context?: GPUCanvasContext;
@@ -64,13 +67,10 @@ export class RenderingEngine {
 		this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 		//set canvas presentation format as the best possible one
 		this.context?.configure({ device: this.device, format: this.presentationFormat });
-		//shaders
-		this.fragmentShader = new Shader('/shaders/frag.wgsl', 'Main fragment shader');
-		this.vertexShader = new Shader('/shaders/vert.wgsl', 'Basic vertex shader');
 		//wait for all shaders to fetch their string src and compile
 		await Promise.all([
-			this.fragmentShader.createShader(this.device),
-			this.vertexShader.createShader(this.device)
+			this.fragmentShader = await ShaderFactoryDynamic.createShader('/shaders/frag.wgsl', 'Main fragment shader', this.device, emptyInputs),
+			this.vertexShader = await ShaderFactoryStatic.createShader('/shaders/vert.wgsl', 'Basic vertex shader', this.device)
 		]);
 		//if any of them failed to compile then exit this function
 		if (!this.fragmentShader.safe || !this.vertexShader.safe) {
@@ -115,9 +115,7 @@ export class RenderingEngine {
 		return this.checkGPUObjects();
 	}
 
-	public setContext(context: GPUCanvasContext) {
-		this.context = context;
-	}
+
 
 	public renderTick() {
 		if (!this.device) {
@@ -158,4 +156,27 @@ export class RenderingEngine {
     private checkGPUObjects() : boolean {
         return (this.context && this.device && this.presentationFormat && this.renderPassDescriptor && this.renderPipeline && this.fragmentShader && this.vertexShader && this.vertexShader.safe && this.fragmentShader.safe) ?? false
     }
+
+	public setContext(context: GPUCanvasContext) {
+		this.context = context;
+	}
+
+	public refreshShaders() {
+		if (!this.checkGPUObjects()) {
+			return;
+		}
+		//create a new shader module
+		//and set a new renderpipeline
+		this.renderPipeline = this.device!.createRenderPipeline({
+			label: 'Main render pipeline',
+			layout: 'auto',
+			vertex: {
+				module: this.vertexShader!.shaderModule!
+			},
+			fragment: {
+				module: this.fragmentShader!.shaderModule!,
+				targets: [{ format: this.presentationFormat! }]
+			}
+		});
+	}
 }

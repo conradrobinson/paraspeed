@@ -1,18 +1,18 @@
+import type ShaderSource from "./ShaderSource";
+
 export class Shader {
 	shaderModule?: GPUShaderModule;
-	private path: string;
-	private shaderString?: string;
+	private source: ShaderSource;
 	private label: string;
     public safe: boolean = false;
-	constructor(path: string, label: string) {
-		this.path = path;
+	constructor(label: string, source: ShaderSource) {
+		this.source = source;
 		this.label = label;
 	}
 	public async createShader(device: GPUDevice) {
-		this.shaderString = await this.getShaderFile();
 		this.shaderModule = device.createShaderModule({
 			label: this.label,
-			code: this.shaderString
+			code: this.source.source
 		});
 		const compilationInfo = await this.shaderModule.getCompilationInfo();
         let foundError = false;
@@ -27,7 +27,5 @@ export class Shader {
                 this.safe = true;
             }
 	}
-	private async getShaderFile() {
-		return (await fetch(this.path)).text();
-	}
+	
 }

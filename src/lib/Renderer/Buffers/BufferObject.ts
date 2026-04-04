@@ -46,7 +46,7 @@ export default class BufferObject<T extends SchemaDefinition> implements IBuffer
 
 	public writeToGPU(device: GPUDevice, data: SchemaPayload<T>) {
 		this.setData(data);
-		this.printHex(this.arrayBuffer)
+		// this.printHex(this.arrayBuffer)
 		if (this.buffer) {
 			device.queue.writeBuffer(this.buffer, 0, this.arrayBuffer);
 		} else {

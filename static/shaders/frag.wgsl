@@ -39,12 +39,16 @@ fn getAlpha(data: EquationData) -> f32 {
     var x = xRatio * f32(width) + f32(inputs.left);
     var y = f32(inputs.top) - yRatio * f32(height);
     
+    {{DERIVED_VARS}}
+
     //define equations
-    let numEqs = 2;
-    let renderables = array(
-        EquationData(y-x, vec3(1, 0, 0), 2, 1),
-        EquationData(sin(x) - y, vec3(0, 0, 1), 1, 0.6)
-    );
+    let numEqs = {{NUMBER_EQUATIONS}};
+    if (numEqs == 0) {
+        return vec4f(0.0,0.0,0.0,1.0);
+    }
+    let renderables = {{EQUATION_DATA}};
+        
+    
 
     //calculate final colour of pixel
     var outputColour = vec4f(vec3f(0),1);
