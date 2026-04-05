@@ -1,15 +1,11 @@
 import { RenderingEngine } from "./Renderer/RenderingEngine"
-import ShaderFactory from "./Renderer/Shaders/ShaderFactory";
-
 class Engine {
     renderingEngine: RenderingEngine = new RenderingEngine();
-    shaderFactory: ShaderFactory = new ShaderFactory("./shaders/frag.wgsl");
     
-    
-
 	constructor() {}
 
     async setup(canvas: HTMLCanvasElement) {
+        
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         const context = canvas.getContext('webgpu')

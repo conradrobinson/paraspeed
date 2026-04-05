@@ -7,7 +7,6 @@ export default class ShaderFactoryDynamic extends ShaderFactory {
     public static async createShader(path: string, label: string, device: GPUDevice, shaderInput: ShaderInputs): Promise<Shader> {
         const shaderString: string = await this.getShaderFile(path);
         const source: ShaderSource = this.generateSource(shaderString, shaderInput);
-        console.log(source.source)
         const shader: Shader = new Shader(label, source);
         await shader.createShader(device);
         return shader;
